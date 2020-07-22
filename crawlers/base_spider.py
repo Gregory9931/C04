@@ -21,7 +21,6 @@ class BaseSpider(scrapy.Spider):
         Spider init operations.
         Create folders to store files and some config and log files.
         """
-        print("TO NO INIT DO BASE SPIDER")
         self.crawler_id = crawler_id
         self.last_flag_check = int(time.time())
         self.stop_flag = False
