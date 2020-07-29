@@ -12,7 +12,7 @@ python setup.py bdist_wheel
 
 The Wheel file will be created inside the `dist` folder, and the name may vary
 depending on the version. To install it, run the following command in the
-`entry_probing` folder, replacing the file name accordingly:
+`form-parser` folder, replacing the file name accordingly:
 
 ```
 pip install dist/<wheel file name>
