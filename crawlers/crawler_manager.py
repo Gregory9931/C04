@@ -84,7 +84,8 @@ def get_crawler_base_settings(config):
 
     return crawler_config
 
-def crawler_process(crawler_id, config):
+
+def crawler_process(crawler_id, config, extra_signals):
     """Starts crawling."""
     # Redirects process logs to files
     sys.stdout = open(f"{CURR_FOLDER_FROM_ROOT}/log/{crawler_id}.out", "a", buffering=1)
@@ -108,11 +109,13 @@ def crawler_process(crawler_id, config):
         print(f"Error at: {crawler_id}")
         # TODO: get port as variable
         port = 8000
-        requests.get(f'http://localhost:{port}/detail/stop_crawl/{config["id"]}/{crawler_id}')
+        requests.get(f'http://localhost:{port}/detail/stop_crawl/{config["id"]}')
 
     for crawler in process.crawlers:
         crawler.signals.connect(update_database, signal=scrapy.signals.spider_error)
         crawler.signals.connect(update_database, signal=scrapy.signals.spider_closed)
+        for sig in extra_signals:
+            crawler.signals.connect(extra_signals[sig], signal=sig)
 
     process.start()
 
@@ -120,7 +123,7 @@ def gen_key():
     """Generates a unique key based on time and a random seed."""
     return str(int(time.time()*100)) + str((int(random.random() * 1000)))
 
-def start_crawler(config):
+def start_crawler(config, extra_signals=None):
     """Create and starts a crawler as a new process."""
     create_folders()
 
@@ -134,7 +137,7 @@ def start_crawler(config):
         f.write(json.dumps({"stop": False}))
 
     # starts new process
-    p = Process(target=crawler_process, args=(crawler_id, config))
+    p = Process(target=crawler_process, args=(crawler_id, config, extra_signals))
     p.start()
 
     return crawler_id
